@@ -84,38 +84,6 @@ export function setupUI(map) {
         searchPanel.classList.add('-translate-y-full');
     });
 
-    // --- Filter Search Listener (Update juga saat mengetik) ---
-    // searchInput.addEventListener('keyup', function(e) { 
-    //     // 1. Ambil input user dan ubah jadi huruf kecil
-    //     const rawInput = e.target.value.toLowerCase();
-        
-    //     // 2. Pecah input menjadi array kata per kata (keywords)
-    //     const keywords = rawInput.split(' ').filter(word => word.trim() !== '');
-
-    //     const items = allLocationsList.getElementsByClassName('location-item');
-        
-    //     Array.from(items).forEach(item => {
-    //         const namaLokasi = item.dataset.nama ? item.dataset.nama.toLowerCase() : "";
-    //         // const deskripsiLokasi = item.dataset.desc ? item.dataset.desc.toLowerCase() : "";
-            
-    //         // Gabungkan nama dan deskripsi agar pencarian mencakup keduanya
-    //         // const fullText = `${namaLokasi} ${deskripsiLokasi}`;
-
-    //         // 3. Logika Pencarian Fleksibel:
-    //         // Cek apakah SEMUA kata kunci (keywords) ada di dalam teks lokasi
-    //         const isMatch = keywords.every(keyword => namaLokasi.includes(keyword));
-
-    //         if (isMatch) {
-    //             item.style.display = 'flex';
-    //         } else {
-    //             item.style.display = 'none';
-    //         }
-    //     });
-
-    //     // Hitung ulang animasi untuk item yang baru tampil
-    //     setTimeout(activateMarquee, 100);
-    // });
-
     // --- Filter Search Listener (Smart Accordion) ---
     searchInput.addEventListener('keyup', function(e) { 
         const rawInput = e.target.value.toLowerCase();
