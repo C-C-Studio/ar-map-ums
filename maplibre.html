@@ -110,6 +110,36 @@
 
             /* Scroll ke ujung */
         }
+
+        /* Animasi Accordion */
+        .children-container {
+            transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+        
+        .children-container.open {
+            max-height: 500px; /* Nilai cukup besar untuk menampung anak */
+            opacity: 1;
+        }
+
+        /* Style Item Anak */
+        .child-item {
+            background-color: #2d4a77; /* Lebih terang sedikit dari parent #1f3a5f */
+            margin-left: 1rem; /* Indentasi */
+            border-left: 2px solid #60a5fa; /* Garis penanda di kiri */
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Rotasi Ikon Panah */
+        .toggle-icon {
+            transition: transform 0.3s;
+        }
+        .toggle-icon.rotate {
+            transform: rotate(180deg);
+        }
     </style>
 </head>
 

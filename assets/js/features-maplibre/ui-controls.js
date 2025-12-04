@@ -62,7 +62,11 @@ export function setupUI(map) {
         const item = e.target.closest('.location-item');
         if (!item) return; 
 
-        const locationBtn = e.target.closest('.location-btn');
+        const locationBtn = e.target.closest('.location-btn'); // Tombol Locate
+        const routeBtn = e.target.closest('.route-btn');       // Tombol Route
+        const toggleBtn = e.target.closest('button');          // Cek toggle (chevron)
+
+        if (toggleBtn && !locationBtn && !routeBtn) return;
         
         if (locationBtn) {
             map.flyTo({
@@ -81,34 +85,124 @@ export function setupUI(map) {
     });
 
     // --- Filter Search Listener (Update juga saat mengetik) ---
-    searchInput.addEventListener('keyup', function(e) { 
-        // 1. Ambil input user dan ubah jadi huruf kecil
-        const rawInput = e.target.value.toLowerCase();
+    // searchInput.addEventListener('keyup', function(e) { 
+    //     // 1. Ambil input user dan ubah jadi huruf kecil
+    //     const rawInput = e.target.value.toLowerCase();
         
-        // 2. Pecah input menjadi array kata per kata (keywords)
-        const keywords = rawInput.split(' ').filter(word => word.trim() !== '');
+    //     // 2. Pecah input menjadi array kata per kata (keywords)
+    //     const keywords = rawInput.split(' ').filter(word => word.trim() !== '');
 
-        const items = allLocationsList.getElementsByClassName('location-item');
+    //     const items = allLocationsList.getElementsByClassName('location-item');
         
-        Array.from(items).forEach(item => {
-            const namaLokasi = item.dataset.nama ? item.dataset.nama.toLowerCase() : "";
-            // const deskripsiLokasi = item.dataset.desc ? item.dataset.desc.toLowerCase() : "";
+    //     Array.from(items).forEach(item => {
+    //         const namaLokasi = item.dataset.nama ? item.dataset.nama.toLowerCase() : "";
+    //         // const deskripsiLokasi = item.dataset.desc ? item.dataset.desc.toLowerCase() : "";
             
-            // Gabungkan nama dan deskripsi agar pencarian mencakup keduanya
-            // const fullText = `${namaLokasi} ${deskripsiLokasi}`;
+    //         // Gabungkan nama dan deskripsi agar pencarian mencakup keduanya
+    //         // const fullText = `${namaLokasi} ${deskripsiLokasi}`;
 
-            // 3. Logika Pencarian Fleksibel:
-            // Cek apakah SEMUA kata kunci (keywords) ada di dalam teks lokasi
-            const isMatch = keywords.every(keyword => namaLokasi.includes(keyword));
+    //         // 3. Logika Pencarian Fleksibel:
+    //         // Cek apakah SEMUA kata kunci (keywords) ada di dalam teks lokasi
+    //         const isMatch = keywords.every(keyword => namaLokasi.includes(keyword));
 
-            if (isMatch) {
-                item.style.display = 'flex';
+    //         if (isMatch) {
+    //             item.style.display = 'flex';
+    //         } else {
+    //             item.style.display = 'none';
+    //         }
+    //     });
+
+    //     // Hitung ulang animasi untuk item yang baru tampil
+    //     setTimeout(activateMarquee, 100);
+    // });
+
+    // --- Filter Search Listener (Smart Accordion) ---
+    searchInput.addEventListener('keyup', function(e) { 
+        const rawInput = e.target.value.toLowerCase();
+        // Pecah input jadi array kata kunci (hapus spasi kosong)
+        const keywords = rawInput.split(' ').filter(word => word.trim() !== '');
+        
+        // Ambil semua grup lokasi
+        const groups = allLocationsList.getElementsByClassName('location-group');
+        
+        Array.from(groups).forEach(group => {
+            // Ambil elemen-elemen penting dalam grup
+            const parentItem = group.querySelector('.location-item:not(.child-item)');
+            const childrenContainer = group.querySelector('.children-container');
+            const childItems = group.querySelectorAll('.child-item'); // NodeList anak-anak
+            const toggleIcon = parentItem.querySelector('.toggle-icon');
+
+            // 1. Cek Apakah Parent Cocok?
+            const parentName = parentItem.dataset.nama ? parentItem.dataset.nama.toLowerCase() : "";
+            const isParentMatch = keywords.every(k => parentName.includes(k));
+
+            // 2. Cek Apakah Anak Cocok?
+            let isAnyChildMatch = false;
+
+            childItems.forEach(child => {
+                const childName = child.dataset.nama ? child.dataset.nama.toLowerCase() : "";
+                // Cek match nama anak
+                const isChildMatch = keywords.every(k => childName.includes(k));
+                
+                if (isChildMatch) {
+                    isAnyChildMatch = true;
+                    child.style.display = 'flex'; // Tampilkan anak ini
+                } else {
+                    // Jika user sedang mencari (keywords > 0), sembunyikan anak yg tidak cocok
+                    // Jika search kosong, kembalikan ke flex (biar normal)
+                    child.style.display = keywords.length > 0 ? 'none' : 'flex';
+                }
+            });
+
+            // --- LOGIKA TAMPILAN AKHIR (DISPLAY LOGIC) ---
+
+            if (keywords.length === 0) {
+                // A. KONDISI RESET (Search Kosong) -> Kembali ke tampilan awal
+                group.style.display = 'block';
+                parentItem.style.display = 'flex';
+                
+                // Tutup Accordion (Reset)
+                if (childrenContainer) {
+                    childrenContainer.classList.remove('open');
+                    if(toggleIcon) toggleIcon.classList.remove('rotate');
+                    // Reset display semua anak agar siap dibuka manual
+                    childItems.forEach(c => c.style.display = 'flex'); 
+                }
+
             } else {
-                item.style.display = 'none';
+                // B. KONDISI SEDANG MENCARI
+                if (isAnyChildMatch) {
+                    // KASUS 1: Anak Ketemu (Misal: "Informatika")
+                    // -> Tampilkan Grup, Tampilkan Parent, BUKA Accordion
+                    group.style.display = 'block';
+                    parentItem.style.display = 'flex';
+                    
+                    if (childrenContainer) {
+                        childrenContainer.classList.add('open'); // <--- INI KUNCINYA
+                        if(toggleIcon) toggleIcon.classList.add('rotate');
+                    }
+
+                } else if (isParentMatch) {
+                    // KASUS 2: Parent Ketemu (Misal: "Gedung J"), tapi user tidak cari anak
+                    // -> Tampilkan Grup, tapi BIARKAN Accordion tertutup (rapi)
+                    group.style.display = 'block';
+                    parentItem.style.display = 'flex';
+                    
+                    if (childrenContainer) {
+                        childrenContainer.classList.remove('open'); 
+                        if(toggleIcon) toggleIcon.classList.remove('rotate');
+                        // Reset anak-anak agar kalau dibuka manual isinya ada
+                        childItems.forEach(c => c.style.display = 'flex');
+                    }
+
+                } else {
+                    // KASUS 3: Tidak ada yang cocok -> Sembunyikan satu grup
+                    group.style.display = 'none';
+                }
             }
         });
 
-        // Hitung ulang animasi untuk item yang baru tampil
+        // Jalankan animasi teks berjalan (marquee) untuk item yang baru muncul
         setTimeout(activateMarquee, 100);
     });
 

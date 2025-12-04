@@ -1,12 +1,15 @@
+// File: data-loader.js
+
 import { state } from './state.js';
 import { handleRouteRequest } from './navigation.js';
 
-// DOM Elements Lokal
 const allLocationsList = document.getElementById('all-locations-list');
 
-// FUNGSI HELPER: MEMPROSES SATU LOKASI ---
-function processSingleLocation(map, lokasi) {
-    // 1. Buat Marker di Peta
+// --- 1. HELPER BARU: KHUSUS MEMBUAT MARKER DI PETA ---
+function createMarker(map, lokasi) {
+    // Jangan buat marker jika ada flag hideMarker (opsional)
+    // if (lokasi.hideMarker) return; 
+
     const popupHTML = `
         <div class="bg-white rounded-lg shadow-md p-3 max-w-xs">
             <h3 class="font-bold text-gray-900">${lokasi.nama}</h3>
@@ -23,120 +26,156 @@ function processSingleLocation(map, lokasi) {
     const popup = new maplibregl.Popup({ offset: 25, closeButton: false, className: 'custom-popup' })
         .setHTML(popupHTML);
 
-    new maplibregl.Marker({ color: "#DC2626" })
+    new maplibregl.Marker({ color: "#DC2626" }) // Warna Merah
         .setLngLat([lokasi.lon, lokasi.lat])
         .setPopup(popup)
         .addTo(map);
 
     popup.on('open', () => { state.activePopup = popup; });
     popup.on('close', () => { if (state.activePopup === popup) state.activePopup = null; });
-
-    // 2. Masukkan ke List Pencarian
-    const listItem = createLocationListItem(lokasi);
-    allLocationsList.appendChild(listItem);
 }
 
-// export function loadMapData(map) {
-//     // 1. Muat Lokasi (Marker)
-//     fetch('assets/data/location.json')
-//         .then(response => response.json())
-//         .then(data => {
-//             allLocationsList.innerHTML = '';
-            
-//             data.forEach(lokasi => {
-//                 // Buat Popup HTML
-//                 const popupHTML = `
-//                     <div class="bg-white rounded-lg shadow-md p-3 max-w-xs">
-//                         <h3 class="font-bold text-gray-900">${lokasi.nama}</h3>
-//                         <p class="text-sm text-gray-600">${lokasi.deskripsi}</p>
-//                         <button class="route-btn-popup w-full mt-2 bg-blue-500 text-white text-sm font-semibold py-1 px-3 rounded" 
-//                                 data-lat="${lokasi.lat}" 
-//                                 data-lon="${lokasi.lon}" 
-//                                 data-nama="${lokasi.nama}"
-//                                 data-desc="${lokasi.deskripsi}">
-//                             <i class="fas fa-route mr-1"></i> Rute ke sini
-//                         </button>
-//                     </div>`;
+// --- 2. HELPER: MEMBUAT HTML LIST ITEM (UI) ---
+function createLocationListItem(lokasi, isChild = false) {
+    const itemDiv = document.createElement('div');
+    
+    // Styling Base
+    let baseClass = 'location-item rounded-xl p-4 flex items-center gap-4 cursor-pointer relative overflow-hidden transition-all';
+    
+    // Beda warna untuk Anak vs Induk
+    if (isChild) {
+        baseClass += ' child-item'; 
+    } else {
+        baseClass += ' bg-[#1f3a5f]'; 
+    }
+    
+    itemDiv.className = baseClass;
+    
+    // Metadata untuk Search Engine
+    itemDiv.dataset.nama = lokasi.nama; 
+    itemDiv.dataset.lat = lokasi.lat;
+    itemDiv.dataset.lon = lokasi.lon;
+    itemDiv.dataset.desc = lokasi.deskripsi;
+    itemDiv.dataset.isChild = isChild; 
 
-//                 const popup = new maplibregl.Popup({ offset: 25, closeButton: false, className: 'custom-popup' })
-//                     .setHTML(popupHTML);
+    // Logika Icon
+    let iconContent;
+    const iconType = lokasi.icon ? lokasi.icon.toLowerCase() : '';
 
-//                 // Marker Merah
-//                 new maplibregl.Marker({ color: "#DC2626" })
-//                     .setLngLat([lokasi.lon, lokasi.lat])
-//                     .setPopup(popup)
-//                     .addTo(map);
+    if (iconType === 'mosque') {
+        iconContent = '<i class="fas fa-mosque text-lg"></i>';
+    } else if (iconType === 'building' || iconType === 'kantor') {
+        iconContent = '<i class="fas fa-building text-lg"></i>';
+    } else if (iconType === 'code') {
+        iconContent = '<i class="fas fa-laptop-code text-lg"></i>';
+    } else if (iconType === 'bullhorn') {
+        iconContent = '<i class="fas fa-bullhorn text-lg"></i>';
+    } else {
+        const letter = (lokasi.icon && lokasi.icon.length <= 2) 
+                       ? lokasi.icon.toUpperCase() 
+                       : (lokasi.nama.charAt(0).toUpperCase() || 'L');
+        iconContent = `<span class="text-xl">${letter}</span>`;
+    }
+    
+    itemDiv.innerHTML = `
+        <div class="flex-shrink-0 w-10 h-10 rounded-full ${isChild ? 'bg-blue-200 text-blue-800' : 'bg-blue-100 text-gray-600'} flex items-center justify-center font-bold shadow-sm">
+            ${iconContent} 
+        </div>
+        
+        <div class="flex-grow min-w-0 flex flex-col gap-0.5 w-[55%]">
+            <div class="marquee-container">
+                <h3 class="marquee-content text-white font-semibold text-base">
+                    ${lokasi.nama}
+                </h3>
+            </div>
+            <div class="marquee-container">
+                <p class="marquee-content text-gray-300 text-sm">
+                    ${lokasi.deskripsi}
+                </p>
+            </div>
+        </div>
 
-//                 popup.on('open', () => { state.activePopup = popup; });
-//                 popup.on('close', () => { if (state.activePopup === popup) state.activePopup = null; });
+        <div class="flex-shrink-0 flex gap-2 z-10 pl-2">
+            <button class="location-btn w-9 h-9 bg-gray-600/50 text-white rounded-lg flex items-center justify-center hover:bg-green-600 active:scale-95 transition-all" title="Lihat Lokasi">
+                <i class="fas fa-location-dot"></i>
+            </button>
 
-//                 const listItem = createLocationListItem(lokasi);
-//                 allLocationsList.appendChild(listItem);
-//             });
-//         })
-//         .catch(error => console.error('Error memuat lokasi:', error));
+            <button class="route-btn w-9 h-9 bg-gray-600/50 text-white rounded-lg flex items-center justify-center hover:bg-blue-600 active:scale-95 transition-all" title="Buat Rute">
+                <i class="fas fa-route"></i>
+            </button>
+        </div>
+    `;
+    return itemDiv;
+}
 
-//     // 2. Muat Jalur Kustom
-//     fetch('assets/data/path.json')
-//         .then(response => response.json())
-//         .then(data => {
-//             const geojsonData = {
-//                 type: 'FeatureCollection',
-//                 features: data.map(jalur => ({
-//                     type: 'Feature',
-//                     properties: { nama: jalur.nama },
-//                     geometry: {
-//                         type: 'LineString',
-//                         coordinates: jalur.coordinates.map(coord => [coord[1], coord[0]])
-//                     }
-//                 }))
-//             };
-
-//             map.addSource('custom-paths', { type: 'geojson', data: geojsonData });
-//             map.addLayer({
-//                 id: 'custom-paths-layer',
-//                 type: 'line',
-//                 source: 'custom-paths',
-//                 layout: { 'line-join': 'round', 'line-cap': 'round' },
-//                 paint: { 'line-color': '#fff34c', 'line-width': 5, 'line-opacity': 1 }
-//             });
-
-//             map.on('click', 'custom-paths-layer', (e) => {
-//                 new maplibregl.Popup()
-//                     .setLngLat(e.lngLat)
-//                     .setHTML(`<b class="text-black">${e.features[0].properties.nama}</b>`)
-//                     .addTo(map);
-//             });
-//         })
-//         .catch(error => console.error('Error memuat jalur:', error));
-// }
-
+// --- 3. FUNGSI UTAMA LOAD DATA ---
 export function loadMapData(map) {
-    // 1. Muat Lokasi (Marker)
+    // A. Muat Data Lokasi (Marker & List)
     fetch('assets/data/location.json')
         .then(response => response.json())
         .then(data => {
-            // Simpan ke state global (untuk fitur history/firebase nanti)
             if (state.allLocationData) state.allLocationData = data;
-
-            allLocationsList.innerHTML = '';
+            allLocationsList.innerHTML = ''; 
             
             data.forEach(parentLokasi => {
-                // A. Proses Induk (Gedung J)
-                processSingleLocation(map, parentLokasi);
+                // 1. Buat Marker untuk Induk
+                createMarker(map, parentLokasi);
 
-                // B. Cek apakah punya Anak/Child (Prodi)
-                if (parentLokasi.sub_locations && parentLokasi.sub_locations.length > 0) {
+                // 2. Buat Struktur List Accordion
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'location-group mb-3';
+
+                // Buat Item Induk
+                const parentItem = createLocationListItem(parentLokasi, false);
+                
+                // Cek Anak
+                const hasChildren = parentLokasi.sub_locations && parentLokasi.sub_locations.length > 0;
+                let childrenContainer = null;
+
+                if (hasChildren) {
+                    // Tombol Toggle Arrow
+                    const toggleBtn = document.createElement('button');
+                    toggleBtn.className = 'w-9 h-9 text-white/70 hover:text-white rounded-lg flex items-center justify-center transition-colors mr-1 z-20';
+                    toggleBtn.innerHTML = '<i class="fas fa-chevron-down toggle-icon transition-transform duration-300"></i>';
+                    
+                    const actionContainer = parentItem.lastElementChild;
+                    actionContainer.insertBefore(toggleBtn, actionContainer.firstChild);
+
+                    // Container Anak
+                    childrenContainer = document.createElement('div');
+                    childrenContainer.className = 'children-container pl-2 pr-1'; 
+
                     parentLokasi.sub_locations.forEach(childLokasi => {
-                        // Proses Anak (Informatika, Komunikasi)
-                        processSingleLocation(map, childLokasi);
+                        // A. Buat Marker untuk Anak (Biar Rame sesuai request)
+                        createMarker(map, childLokasi);
+
+                        // B. Buat Item List untuk Anak
+                        const childItem = createLocationListItem(childLokasi, true);
+                        childrenContainer.appendChild(childItem);
+                    });
+
+                    // Event Klik Toggle
+                    toggleBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const icon = toggleBtn.querySelector('.toggle-icon');
+                        if (childrenContainer.classList.contains('open')) {
+                            childrenContainer.classList.remove('open');
+                            icon.classList.remove('rotate');
+                        } else {
+                            childrenContainer.classList.add('open');
+                            icon.classList.add('rotate');
+                        }
                     });
                 }
+
+                groupDiv.appendChild(parentItem);
+                if (childrenContainer) groupDiv.appendChild(childrenContainer);
+                allLocationsList.appendChild(groupDiv);
             });
         })
         .catch(error => console.error('Error memuat lokasi:', error));
 
-    // 2. Muat Jalur Kustom (Kode Path tetap sama, tidak berubah)
+    // B. Muat Jalur Kustom (Path) - TIDAK BERUBAH
     fetch('assets/data/path.json')
         .then(response => response.json())
         .then(data => {
@@ -169,80 +208,17 @@ export function loadMapData(map) {
             });
         })
         .catch(error => console.error('Error memuat jalur:', error));
-}
-
-// Helper:
-// Versi dengan marquee effect
-function createLocationListItem(lokasi) {
-    const itemDiv = document.createElement('div');
-    itemDiv.className = 'location-item bg-[#1f3a5f] rounded-xl p-4 flex items-center gap-4 cursor-pointer relative overflow-hidden';
-    
-    itemDiv.dataset.nama = lokasi.nama; 
-    itemDiv.dataset.lat = lokasi.lat;
-    itemDiv.dataset.lon = lokasi.lon;
-    itemDiv.dataset.desc = lokasi.deskripsi;
-
-    let iconContent;
-    const iconType = lokasi.icon ? lokasi.icon.toLowerCase() : '';
-
-    if (iconType === 'mosque') {
-        // Jika tipe masjid -> Gunakan Icon Masjid
-        iconContent = '<i class="fas fa-mosque text-lg"></i>';
-    } else if (iconType === 'building') {
-        // Jika tipe building (Siwal) -> Gunakan Icon Gedung
-        iconContent = '<i class="fas fa-building text-lg"></i>';
-    } else if (iconType === 'code') {
-        // Ikon Informatika
-        iconContent = '<i class="fas fa-laptop-code text-lg"></i>';
-    } else if (iconType === 'bullhorn') {
-        // Ikon Komunikasi
-        iconContent = '<i class="fas fa-bullhorn text-lg"></i>';
-    } else {
-        // Default: Gunakan Huruf
-        // Jika di JSON icon="J", pakai itu. Jika tidak, ambil huruf pertama nama.
-        const letter = (lokasi.icon && lokasi.icon.length <= 2) 
-                       ? lokasi.icon.toUpperCase() 
-                       : (lokasi.nama.charAt(0).toUpperCase() || 'X');
         
-        iconContent = `<span class="text-xl">${letter}</span>`;
-    }
-    
-    itemDiv.innerHTML = `
-        <div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 text-gray-600 flex items-center justify-center font-bold shadow-sm">
-            ${iconContent} 
-        </div>
-        
-        <div class="flex-grow min-w-0 flex flex-col gap-0.5 w-[60%]">
-            
-            <div class="marquee-container">
-                <h3 class="marquee-content text-white font-semibold text-base">
-                    ${lokasi.nama}
-                </h3>
-            </div>
-            
-            <div class="marquee-container">
-                <p class="marquee-content text-gray-300 text-sm">
-                    ${lokasi.deskripsi}
-                </p>
-            </div>
-        </div>
-
-        <div class="flex-shrink-0 flex gap-2 z-10 bg-[#1f3a5f] pl-2 shadow-[-10px_0_10px_#1f3a5f]">
-            <button class="location-btn w-9 h-9 bg-gray-600/50 text-white rounded-lg flex items-center justify-center"><i class="fas fa-location-dot"></i></button>
-            <button class="route-btn w-9 h-9 bg-gray-600/50 text-white rounded-lg flex items-center justify-center"><i class="fas fa-route"></i></button>
-        </div>
-    `;
-    return itemDiv;
-}
-
-// Global Listener untuk tombol di dalam Popup (karena innerHTML string)
-document.getElementById('map').addEventListener('click', function(e) {
-    if (e.target.matches('.route-btn-popup, .route-btn-popup *')) {
-        const button = e.target.closest('.route-btn-popup');
-        handleRouteRequest(button.dataset.lat, button.dataset.lon, button.dataset.nama, button.dataset.desc); 
-        if (state.activePopup) {
-            state.activePopup.remove();
-            state.activePopup = null;
+    // C. Global Listener Popup (Agar tombol 'Rute ke sini' di marker merah berfungsi)
+    const mapContainer = document.getElementById('map');
+    mapContainer.addEventListener('click', function(e) {
+        if (e.target.matches('.route-btn-popup, .route-btn-popup *')) {
+            const button = e.target.closest('.route-btn-popup');
+            handleRouteRequest(button.dataset.lat, button.dataset.lon, button.dataset.nama, button.dataset.desc); 
+            if (state.activePopup) {
+                state.activePopup.remove();
+                state.activePopup = null;
+            }
         }
-    }
-});
+    });
+}
