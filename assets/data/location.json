@@ -10,10 +10,28 @@
   {
     "id": "gedung_j",
     "icon": "J",
-    "nama": "Gedung J: Fakultas Komunikasi dan Informatika",
-    "deskripsi": "Ilmu Komunikasi, Teknik Informatika, dan Sistem Informasi.",
+    "nama": "Gedung J: FKI",
+    "deskripsi": "Fakultas Komunikasi dan Informatika",
     "lat": -7.55670,
-    "lon": 110.77115
+    "lon": 110.77115,
+    "sub_locations": [
+      {
+        "id": "prodi_teknik_informatika",
+        "icon": "code",
+        "nama": "Prodi Teknik Informatika",
+        "deskripsi": "Lantai 2, Sayap Kanan (Gedung J)",
+        "lat": -7.5566399,
+        "lon": 110.7709274
+      },
+      {
+        "id": "prodi_ilmu_komunikasi",
+        "icon": "bullhorn",
+        "nama": "Prodi Ilmu Komunikasi",
+        "deskripsi": "Lantai 2, Sayap Kiri (Gedung J)",
+        "lat": -7.5567090,
+        "lon": 110.7713546
+      }
+    ]
   },
   {
     "id": "masjid_sudalmiyah",
