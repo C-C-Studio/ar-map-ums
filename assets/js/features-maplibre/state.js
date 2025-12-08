@@ -50,6 +50,7 @@ export const elements = {
     routeDestTime: document.getElementById('route-dest-time'),
     
     startNavBtn: document.getElementById('start-nav-btn'),
+    closeRouteBtn: document.getElementById('close-route-btn'),
     cancelNavBtn: document.getElementById('cancel-nav-btn'),
     snapToRoadBtn: document.getElementById('snap-to-road-btn'),
 

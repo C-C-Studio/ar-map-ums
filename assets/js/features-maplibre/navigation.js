@@ -11,6 +11,13 @@ export function setupNavigation(map, geolocateCtrl) {
     elements.cancelNavBtn.addEventListener('click', cancelNavigationMode);
     elements.snapToRoadBtn.addEventListener('click', toggleSnapToRoad);
 
+    // Listener Tombol Close
+    if (elements.closeRouteBtn) {
+        elements.closeRouteBtn.addEventListener('click', () => {
+            cancelNavigationMode();
+        });
+    }
+
     // Listener untuk tombol Selesai di Popup
     if (elements.arrivalDoneBtn) {
         elements.arrivalDoneBtn.addEventListener('click', () => {
