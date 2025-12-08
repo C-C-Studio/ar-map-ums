@@ -15,6 +15,7 @@ export const state = {
     snapBackTimer: null,
     currentRouteLine: null, // Untuk Snap-to-Road
     isSnapToRoadActive: false, // Default mati
+    destinationMarker: null, // Marker tujuan navigasi
 
     // Kompas & Marker
     lastCompassAlpha: 0,

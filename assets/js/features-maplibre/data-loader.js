@@ -5,8 +5,7 @@ import { handleRouteRequest } from './navigation.js';
 
 const allLocationsList = document.getElementById('all-locations-list');
 
-function createMarker(map, lokasi) {
-    // ... (Kode createMarker Anda tetap sama)
+function createMarker(map, lokasi) { // sudah tidak terpakai
     const popupHTML = `
         <div class="bg-white rounded-lg shadow-md p-3 max-w-xs">
             <h3 class="font-bold text-gray-900">${lokasi.nama}</h3>
@@ -113,7 +112,7 @@ export function loadMapData(map) {
             
             data.forEach(parentLokasi => {
                 // 1. Buat Marker untuk Induk
-                createMarker(map, parentLokasi);
+                // createMarker(map, parentLokasi);
 
                 // 2. Buat Struktur List Accordion
                 const groupDiv = document.createElement('div');
@@ -156,7 +155,7 @@ export function loadMapData(map) {
                     childrenContainer.className = 'children-container pl-2 pr-1'; 
 
                     parentLokasi.sub_locations.forEach(childLokasi => {
-                        createMarker(map, childLokasi);
+                        // createMarker(map, childLokasi);
                         const childItem = createLocationListItem(childLokasi, true);
                         childrenContainer.appendChild(childItem);
                     });

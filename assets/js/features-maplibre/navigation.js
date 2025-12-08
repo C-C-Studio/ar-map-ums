@@ -50,6 +50,17 @@ export async function createRoute(map, destLat, destLon, destName, destDesc = ""
         alert("Lokasi Anda belum ditemukan. Silakan aktifkan lokasi Anda.");
         return;
     }
+    if (state.destinationMarker) {
+        state.destinationMarker.remove();
+        state.destinationMarker = null;
+    }
+
+    const markerEl = document.createElement('div');
+    markerEl.className = 'marker-destination';
+    // Gunakan SVG Pin Merah atau default MapLibre
+    state.destinationMarker = new maplibregl.Marker({ color: "#DC2626" }) 
+        .setLngLat([destLon, destLat])
+        .addTo(map);
 
     const startLng = state.userLocation[0];
     const startLat = state.userLocation[1];
@@ -198,6 +209,10 @@ export function cancelNavigationMode() {
     clearTimeout(state.snapBackTimer);
     state.snapBackTimer = null;
     state.currentRouteLine = null;
+    if (state.destinationMarker) {
+        state.destinationMarker.remove();
+        state.destinationMarker = null;
+    }
     
     if (elements.routeInfoPanel) elements.routeInfoPanel.classList.add('translate-y-full');
     elements.cancelNavBtn.style.display = 'none';
