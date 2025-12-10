@@ -2,21 +2,18 @@
 =========================================
  FILE: geofence.js
  (Logika Pengecekan Radius Kampus)
- (DIUBAH UNTUK MAPLIBRE)
 =========================================
 */
 
-// --- INI SAKLARNYA ---
+// Aktifkan atau Nonaktifkan Pengecekan Radius Kampus
 const IS_CAMPUS_CHECK_ENABLED = false;
 
 // --- KONFIGURASI AREA KAMPUS ---
-
-// 1. DIUBAH: Tentukan Titik Pusat Kampus (Gunakan format MapLibre)
-// Format: new maplibregl.LngLat(LONGITUDE, LATITUDE)
+// 1. Tentukan Titik Pusat Kampus (LngLat MapLibre)
 const CAMPUS_CENTER = new maplibregl.LngLat(110.7711, -7.5567);
 
 // 2. Tentukan Radius (dalam METER)
-const CAMPUS_RADIUS_METERS = 800;
+const CAMPUS_RADIUS_METERS = 800; //meter
 
 /**
  * Fungsi utama untuk mengecek apakah pengguna ada di dalam radius kampus.
@@ -28,8 +25,6 @@ function isUserOnCampus(userLngLat) {
     console.log("Geofence: Check dinonaktifkan (Mode Development).");
     return true;
   }
-
-  // 2. DIUBAH: Gunakan fungsi .distanceTo() milik MapLibre
   const distance = userLngLat.distanceTo(CAMPUS_CENTER);
 
   console.log(`Geofence: Jarak ke pusat kampus: ${distance} meter.`);
