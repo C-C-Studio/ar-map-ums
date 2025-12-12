@@ -31,6 +31,16 @@
             color: #9ca3af;
         }
 
+        /* Menyembunyikan scrollbar untuk Chrome, Safari dan Opera */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        /* Menyembunyikan scrollbar untuk IE, Edge dan Firefox */
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+
         .maplibregl-popup-content {
             background: none;
             box-shadow: none;
@@ -231,7 +241,7 @@
 
         <div id="search-panel"
             class="absolute inset-0 z-30 bg-[#0c2340]/70 backdrop-blur-md flex flex-col transition-transform duration-300 ease-in-out -translate-y-full">
-            <main class="flex-grow p-5 overflow-y-auto">
+            <main class="flex-grow p-5 overflow-y-auto no-scrollbar">
                 <div class="flex items-center gap-4 mb-6">
                     <button id="close-search-btn" class="text-white text-xl" title="Back to Map">
                         <i class="fas fa-arrow-left" aria-hidden="true"></i>
