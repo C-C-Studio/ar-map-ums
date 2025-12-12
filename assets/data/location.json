@@ -4,16 +4,17 @@
     "icon": "building",
     "nama": "Gedung Induk Siti Walidah (Siwal)",
     "deskripsi": "Kantor Pusat UMS.",
-    "lat": -7.55809, 
-    "lon": 110.77180
+    "lat": -7.5580900, 
+    "lon": 110.7718000
   },
+
   {
     "id": "gedung_j",
     "icon": "J",
     "nama": "Gedung J: FKI",
     "deskripsi": "Fakultas Komunikasi dan Informatika",
-    "lat": -7.55670,
-    "lon": 110.77115,
+    "lat": -7.5567000,
+    "lon": 110.7711500,
     "sub_locations": [
       {
         "id": "prodi_teknik_informatika",
@@ -33,20 +34,37 @@
       }
     ]
   },
+  
+  {
+    "id": "library_campus2",
+    "icon": "library",
+    "nama": "Perpustakaan UMS",
+    "deskripsi": "Perpustakaan Universitas Muhammadiyah Surakarta",
+    "lat": -7.5560155,
+    "lon": 110.7704724
+  },
   {
     "id": "masjid_sudalmiyah",
     "icon": "mosque",
     "nama": "Masjid Sudalmiyah Rais",
-    "deskripsi": "Masjid Kampus 2 UMS.",
-    "lat": -7.55615,
-    "lon": 110.77112
+    "deskripsi": "Masjid Kampus 2 UMS",
+    "lat": -7.5561500,
+    "lon": 110.7711200
   },
   {
-    "id": "test",
-    "icon": "T",
-    "nama": "Gedung Test: Fakultas Test dan Test",
-    "deskripsi": "Ilmu Test, Teknik Test, dan Sistem Test.",
-    "lat": -7.541181,
-    "lon": 110.623435
+    "id": "kantin_teknik",
+    "icon": "canteen",
+    "nama": "Kantin Teknik",
+    "deskripsi": "Kantin Teknik Kampus 2 UMS",
+    "lat": -7.5548637,
+    "lon": 110.7709678
+  },
+  {
+    "id": "ktd",
+    "icon": "canteen",
+    "nama": "Kantin Tepi Danau (KTD)",
+    "deskripsi": "Kantin Tepi Danau Kampus 2 UMS",
+    "lat": -7.5568436, 
+    "lon": 110.7721079
   }
 ]

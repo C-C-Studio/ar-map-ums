@@ -58,12 +58,16 @@ function createLocationListItem(lokasi, isChild = false) {
 
     if (iconType === 'mosque') {
         iconContent = '<i class="fas fa-mosque text-lg"></i>';
-    } else if (iconType === 'building' || iconType === 'kantor') {
+    } else if (iconType === 'building') {
         iconContent = '<i class="fas fa-building text-lg"></i>';
     } else if (iconType === 'code') {
         iconContent = '<i class="fas fa-laptop-code text-lg"></i>';
     } else if (iconType === 'bullhorn') {
         iconContent = '<i class="fas fa-bullhorn text-lg"></i>';
+    } else if (iconType === 'canteen') {
+        iconContent = '<i class="fas fa-utensils text-lg"></i>'; 
+    } else if (iconType === 'library') {
+        iconContent = '<i class="fas fa-book text-lg"></i>';
     } else {
         const letter = (lokasi.icon && lokasi.icon.length <= 2) 
                        ? lokasi.icon.toUpperCase() 
@@ -107,6 +111,8 @@ export function loadMapData(map) {
     fetch('assets/data/location.json')
         .then(response => response.json())
         .then(data => {
+            // Urutkan data berdasarkan nama lokasi
+            data.sort((a, b) => a.nama.localeCompare(b.nama));
             if (state.allLocationData) state.allLocationData = data;
             allLocationsList.innerHTML = ''; 
             
@@ -126,7 +132,9 @@ export function loadMapData(map) {
                 let childrenContainer = null;
 
                 if (hasChildren) {
-                    
+                    // Urutkan Anak berdasarkan nama
+                    parentLokasi.sub_locations.sort((a, b) => a.nama.localeCompare(b.nama));
+
                     // 1. Ubah Layout Parent jadi Column dan Hapus Padding Bawaan
                     parentItem.classList.remove('flex-row', 'items-center', 'p-4'); 
                     parentItem.classList.add('flex', 'flex-col', 'p-0', 'pb-0'); 
